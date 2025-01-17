@@ -1,9 +1,11 @@
 import express from "express"
 import { userModel } from "../db";
 import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
+require('dotenv').config()
 const userRouter = express.Router();
 
-userRouter.get('/signup', async(req,res)=>{
+userRouter.post('/signup', async(req,res)=>{
     const {username, email, password} = req.body;
     const hashedPassword = await bcrypt.hash(password,2);
     await userModel.create({
@@ -14,7 +16,7 @@ userRouter.get('/signup', async(req,res)=>{
     })
 })
 
-userRouter.get('/signin', async(req,res)=>{
+userRouter.post('/signin', async(req,res)=>{
     const {email, password} = req.body;
     try{
         const user = await userModel.findOne({ email })
@@ -26,8 +28,10 @@ userRouter.get('/signin', async(req,res)=>{
         }
         const passwordMatch = await bcrypt.compare(password, user?.password)
         if(user && passwordMatch){
+            const token = jwt.sign({userId: user._id.toString()}, process.env.JWT_SECRET!)
             res.json({
-                message:"user signin successfull"
+                message:"user signin successfull",
+                token
             })
         }
         else{
@@ -39,3 +43,8 @@ userRouter.get('/signin', async(req,res)=>{
         console.log(err)
     }
 })
+
+userRouter.get('/dashboard', )
+
+
+export default userRouter;

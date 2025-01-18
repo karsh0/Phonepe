@@ -1,5 +1,5 @@
 import express from "express"
-import { userModel } from "../db";
+import { accountModel, userModel } from "../db";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { userMiddleware } from "../middlewares/userMiddleware";
@@ -51,6 +51,10 @@ userRouter.get('/dashboard', userMiddleware, (req, res)=>{
         message:"dashboard",
         userId: req.userId
     })
+})
+
+userRouter.post('/transfer', userMiddleware, async (req,res)=>{
+   
 })
 
 

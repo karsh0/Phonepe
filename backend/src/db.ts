@@ -12,8 +12,9 @@ const userSchema = new Schema({
 const accountSchema = new Schema({
     userId: {type: mongoose.Types.ObjectId, ref:"User"},
     accountName: String,
-    accountNumber: String,
+    accountNumber: Number,
     accountType: String,
+    balance: Number,
 })
 
 const userModel = model('User', userSchema)

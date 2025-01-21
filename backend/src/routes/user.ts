@@ -53,8 +53,15 @@ userRouter.get('/dashboard', userMiddleware, (req, res)=>{
     })
 })
 
-userRouter.post('/transfer', userMiddleware, async (req,res)=>{
-   
+userRouter.get('/bulk',async(req,res)=>{
+    const users = await userModel.find();
+    res.json({
+        users: users.map(user =>({
+            username:user.username,
+            email:user.email
+        }))
+    })
+        
 })
 
 

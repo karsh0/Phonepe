@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { userModel } from "../db";
-import jwt, { decode } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 require("dotenv").config();
 
 export async function userMiddleware(req: Request, res: Response, next:NextFunction){

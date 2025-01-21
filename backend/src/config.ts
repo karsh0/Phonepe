@@ -9,9 +9,6 @@ export async function randomNumber(){
         if(x.accountNumber == number){
             randomNumber();
         }
-        else{
-            return number;
-        }
     })
     return number;
 }

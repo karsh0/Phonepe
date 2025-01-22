@@ -3,15 +3,17 @@ import { accountModel, userModel } from "../db";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { userMiddleware } from "../middlewares/userMiddleware";
+import cors from "cors"
 require('dotenv').config()
 const userRouter = express.Router();
 userRouter.use(express.json())
 
+
 userRouter.post('/signup', async(req,res)=>{
-    const {username, email, password} = req.body;
+    const {email, password} = req.body;
     const hashedPassword = await bcrypt.hash(password,2);
     await userModel.create({
-        username, email, password:hashedPassword
+        email, password:hashedPassword
     })
     res.json({
         message:"user signup successfull"
@@ -57,7 +59,6 @@ userRouter.get('/bulk',async(req,res)=>{
     const users = await userModel.find();
     res.json({
         users: users.map(user =>({
-            username:user.username,
             email:user.email
         }))
     })

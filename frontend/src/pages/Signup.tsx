@@ -11,14 +11,22 @@ export default function Signup(){
     const emailRef = useRef<HTMLInputElement | null>()
     const passwordRef = useRef<HTMLInputElement | null>()
 
-    async function userSignup(){
-        const email = emailRef.current?.value;
-        const password = passwordRef.current?.value;
-
-        await axios.post(BACKEND_URL+'/user/signup', {
-            email, password
-        })
-        navigate('/signin')
+    async function userSignup() {
+        try {
+            const email = emailRef.current?.value;
+            const password = passwordRef.current?.value;
+    
+            if (!email || !password) {
+                alert("Email and password are required");
+                return;
+            }
+    
+            await axios.post(`${BACKEND_URL}/user/signup`, { email, password });
+            navigate('/signin');
+        } catch (err) {
+            console.error(err);
+            alert("Signup failed. Please try again.");
+        }
     }
 
     return <div className="w-screen h-screen flex items-center justify-center">

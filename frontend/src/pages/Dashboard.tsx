@@ -5,9 +5,11 @@ import { OpenAccount } from "../components/OpenAccount";
 import { Button } from "../components/Button";
 import { Logo } from "../components/Logo";
 import { UserModal } from "../components/UserModal";
+import { OpenAccountModal } from "../components/OpenAccountModal";
 
 export default function Dashboard(){
         const [user, setUser] = useState<any>(null)
+        const [AccountToggle, setAccountToggle] = useState(false)
 
         interface DashboardResponse {
             userId: string;
@@ -26,12 +28,14 @@ export default function Dashboard(){
             main()
         },[])
         
-        return <div className="w-screen px-10 py-5 flex flex-col gap-4">
+        return <div className="w-screen relative">
+            <OpenAccountModal/>
+            <div className="w-screen px-10 py-5 flex flex-col gap-4">
             <div className="flex justify-between items-center">
             <Logo/>
             <UserModal/>
             </div>
-        <div className="flex">
+        <div className="flex gap-14">
             <div className="w-1/4 py-10">
                 <Button text="Send Money" rounded={true} variant="primary"/>
                 <ul className="flex flex-col gap-4 px-10 mt-8">
@@ -43,10 +47,11 @@ export default function Dashboard(){
             </div>
             <div>
                 <h1 className="text-3xl font-semibold mb-5">Account</h1>
-
-                <OpenAccount/>
-
+                <div onClick={()=> setAccountToggle(!AccountToggle)}>
+                <OpenAccount />
+                </div>
             </div>
         </div>
     </div>
+        </div>
 }

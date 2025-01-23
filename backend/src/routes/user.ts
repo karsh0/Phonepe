@@ -48,10 +48,11 @@ userRouter.post('/signin', async(req,res)=>{
     }
 })
 
-userRouter.get('/dashboard', userMiddleware, (req, res)=>{
+userRouter.get('/dashboard', userMiddleware,async (req, res)=>{
+    const user = await accountModel.find({userId: req.userId}).populate('userId')
     res.json({
         message:"dashboard",
-        userId: req.userId
+        user
     })
 })
 

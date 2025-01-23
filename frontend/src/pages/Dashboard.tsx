@@ -7,6 +7,7 @@ import { Logo } from "../components/Logo";
 import { UserModal } from "../components/UserModal";
 import { OpenAccountModal } from "../components/OpenAccountModal";
 import { AccountCard } from "../components/AccountCard";
+import { Sidebar } from "../components/Sidebar";
 
 interface Account {
   accountName: string;
@@ -57,15 +58,7 @@ export default function Dashboard() {
           <UserModal />
         </div>
         <div className="flex">
-          <div className="w-1/4 py-10">
-            <Button text="Send Money" variant="primary" />
-            <ul className="flex flex-col gap-4 px-10 mt-8">
-              <li className="text-xl font-semibold">Home</li>
-              <li className="text-xl font-semibold">Cards</li>
-              <li className="text-xl font-semibold">Manage</li>
-              <li className="text-xl font-semibold">Earn</li>
-            </ul>
-          </div>
+          <Sidebar/>
           <div>
             <h1 className="text-3xl font-semibold mb-5">Account</h1>
             <div className="flex gap-4"> 
@@ -82,12 +75,13 @@ export default function Dashboard() {
                   />
                 ))
               ) : (
-                <p className="text-lg font-medium text-gray-500">
-                  No accounts found.
-                </p>
+                null
               )}
             </div>
             </div>
+            <p className="text-lg font-medium text-gray-500 mt-10">
+                Transaction History coming soon.
+            </p>
           </div>
         </div>
       </div>

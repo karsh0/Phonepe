@@ -3,23 +3,40 @@ import { accountModel, userModel } from "../db";
 import { userMiddleware } from "../middlewares/userMiddleware";
 import mongoose from "mongoose";
 import { randomNumber } from "../config";
+import bcrypt from "bcrypt"
 
 const router = Router();
 
-router.post('/create', userMiddleware, async (req,res)=>{
-    const {accountName, accountType} = req.body;
-    const number = await randomNumber();
-    await accountModel.create({
-        userId: req.userId,
-        accountName,
-        accountType,
-        accountNumber: number,
-        balance: 10000
-    })
-    res.json({
-        message:"account created successfully"
-    })
-})
+router.post('/create', userMiddleware, async (req, res) => {
+    const { accountName, accountType, password } = req.body;
+    try {
+        const user = await userModel.findOne({ _id: req.userId });
+        console.log(user)
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+        }
+
+        const authenticated = await bcrypt.compare(password, user?.password!);
+        
+        if (authenticated) {
+            const number = await randomNumber();
+            await accountModel.create({
+                userId: req.userId,
+                accountName,
+                accountType,
+                accountNumber: number,
+                balance: 10000
+            });
+             res.json({ message: "Account created successfully" });
+        } else {
+             res.status(401).json({ message: "Invalid password" });
+        }
+    } catch (error) {
+        console.error(error);
+         res.status(500).json({ message: "Internal server error" });
+    }
+});
+
 
 router.get('/balance',userMiddleware, async(req,res)=>{
     const account = await accountModel.findOne({userId: req.userId});

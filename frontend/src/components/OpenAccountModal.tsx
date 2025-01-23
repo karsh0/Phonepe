@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { LabelledInput } from "./LabelledInput";
 import { Button } from "./Button";
 import { CrossIcon } from "./ui/CrossIcon";
 import { BACKEND_URL } from "../config";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 enum AccountEnum {
@@ -20,10 +19,11 @@ export function OpenAccountModal({toggle,setToggle}: {toggle: boolean;setToggle:
         const response = await axios.post(BACKEND_URL+'/account/create',  {
             accountName: AccountName,
             accountType: AccountType,
+            password: passwordRef.current?.value
           },
           {
             headers: {
-              authorization: localStorage.getItem("token"),
+              Authorization: localStorage.getItem("token"),
             },
           })
         if(response.data){
@@ -31,13 +31,14 @@ export function OpenAccountModal({toggle,setToggle}: {toggle: boolean;setToggle:
         }
     }catch(err){
         console.log(err);
-        alert('account creating failed')
+        alert('Please check your inputs')
     }
 
 }
 
   const [AccountType, setAccountType] = useState<AccountEnum>(AccountEnum.SAVING);
-  const [AccountName, setAccountName] = useState("sbi bank");
+  const [AccountName, setAccountName] = useState("SBI Bank");
+  const passwordRef = useRef<HTMLInputElement>();
 
   return (
     toggle && (
@@ -46,7 +47,7 @@ export function OpenAccountModal({toggle,setToggle}: {toggle: boolean;setToggle:
           <form className="flex flex-col gap-3">
             <div
               className="absolute top-5 right-10 cursor-pointer"
-              onClick={() => setToggle(false)} // Close the modal when CrossIcon is clicked
+              onClick={() => setToggle(false)}
             >
               <CrossIcon />
             </div>
@@ -57,9 +58,9 @@ export function OpenAccountModal({toggle,setToggle}: {toggle: boolean;setToggle:
                 onChange={(e) => setAccountName(e.target.value)}
                 className="px-3 py-3 rounded-md"
               >
-                <option value={"sbi bank"}>State Bank of India</option>
-                <option value={"union bank"}>Union Bank</option>
-                <option value={"kotak bank"}>Kotak Bank</option>
+                <option value={"SBI Bank"}>State Bank of India</option>
+                <option value={"Union Bank"}>Union Bank</option>
+                <option value={"Kotak Bank"}>Kotak Bank</option>
               </select>
             </div>
             <div className="flex flex-col gap-2">
@@ -77,7 +78,7 @@ export function OpenAccountModal({toggle,setToggle}: {toggle: boolean;setToggle:
             <LabelledInput
               label="Enter your Password"
               placeholder="Enter password"
-              reference={null}
+              reference={passwordRef}
               className="text-xl font-semibold"
             />
             <Button text="Create Account" rounded={true} onClick={handleCreateAccount} />

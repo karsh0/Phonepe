@@ -1,4 +1,3 @@
-import { PLusIcon } from "./ui/PlusIcon"
 
 interface AccountCardProps{
     accountName: string,

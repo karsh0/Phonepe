@@ -10,10 +10,10 @@ userRouter.use(express.json())
 
 
 userRouter.post('/signup', async(req,res)=>{
-    const {email, password} = req.body;
+    const {username, password} = req.body;
     const hashedPassword = await bcrypt.hash(password,2);
     await userModel.create({
-        email, password:hashedPassword
+        username, password:hashedPassword
     })
     res.json({
         message:"user signup successfull"
@@ -21,9 +21,9 @@ userRouter.post('/signup', async(req,res)=>{
 })
 
 userRouter.post('/signin', async(req,res)=>{
-    const {email, password} = req.body;
+    const {username, password} = req.body;
     try{
-        const user = await userModel.findOne({ email })
+        const user = await userModel.findOne({ username })
         if(!user || user.password == undefined){
             res.json({
                 message:"user not found!"
@@ -60,7 +60,7 @@ userRouter.get('/bulk',async(req,res)=>{
     const users = await userModel.find();
     res.json({
         users: users.map(user =>({
-            email:user.email
+            username:user.username
         }))
     })
         

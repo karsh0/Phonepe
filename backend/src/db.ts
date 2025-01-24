@@ -4,7 +4,7 @@ require('dotenv').config()
 mongoose.connect(process.env.MONGO_URI || "")
 
 const userSchema = new Schema({
-    email: {type:String},
+    username: {type:String},
     password: {type:String}
 })
 

@@ -12,21 +12,21 @@ interface SigninResponse {
 
 export default function Signin() {
     const navigate = useNavigate();
-    const emailRef = useRef<HTMLInputElement>(null);
+    const usernameRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
 
     async function userSignin() {
-        const email = emailRef.current?.value;
+        const username = usernameRef.current?.value;
         const password = passwordRef.current?.value;
 
-        if (!email || !password) {
+        if (!username || !password) {
             alert("Please fill in both fields.");
             return;
         }
 
         try {
             const response = await axios.post<SigninResponse>(`${BACKEND_URL}/user/signin`, {
-                email,
+                username,
                 password,
             });
 
@@ -50,7 +50,7 @@ export default function Signin() {
             <div className="flex items-center justify-center">
             <div className="w-1/3">
                 <div className="w-full h-full flex flex-col gap-5">
-                    <LabelledInput label="Enter your email address" reference={emailRef} />
+                    <LabelledInput label="Enter your username" reference={usernameRef} />
                     <LabelledInput label="Enter your password" reference={passwordRef} />
                     <Button text="Signin" onClick={userSignin} variant="primary" rounded={true} />
                 </div>

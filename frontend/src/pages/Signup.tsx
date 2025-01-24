@@ -9,20 +9,20 @@ import { Logo } from "../components/Logo";
 
 export default function Signup(){
     const navigate = useNavigate()
-    const emailRef = useRef<HTMLInputElement | null>()
+    const usernameRef = useRef<HTMLInputElement | null>()
     const passwordRef = useRef<HTMLInputElement | null>()
 
     async function userSignup() {
         try {
-            const email = emailRef.current?.value;
+            const username = usernameRef.current?.value;
             const password = passwordRef.current?.value;
     
-            if (!email || !password) {
-                alert("Email and password are required");
+            if (!username || !password) {
+                alert("username and password are required");
                 return;
             }
     
-            await axios.post(`${BACKEND_URL}/user/signup`, { email, password });
+            await axios.post(`${BACKEND_URL}/user/signup`, { username, password });
             navigate('/signin');
         } catch (err) {
             console.error(err);
@@ -35,7 +35,7 @@ export default function Signup(){
         <div className="flex items-center justify-center">
         <div className="w-1/3">
         <div className="w-full h-full flex flex-col gap-5">
-            <LabelledInput label="Enter your email address" reference={emailRef}/>
+            <LabelledInput label="Enter your username" reference={usernameRef}/>
             <LabelledInput label="Enter your password" reference={passwordRef} />
             <Button text="Signup" onClick={userSignup} variant="primary" rounded={true}/>
         </div>

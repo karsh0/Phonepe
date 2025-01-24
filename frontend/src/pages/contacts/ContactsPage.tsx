@@ -4,28 +4,42 @@ import { Logo } from "../../components/Logo";
 import axios from "axios";
 import { BACKEND_URL } from "../../config";
 import { ChatBox } from "../../components/chats/ChatBox";
+import { Contact } from "../../components/contacts/Contact";
 
-interface Contact{
-    username: string
+export interface User {
+  username: string;
 }
 
-interface ContactResponse{
-    users: Contact[]
+interface ContactResponse {
+  users: User[];
 }
 
-export function ContactPage(){
-    const [allUsers, setAllUsers] = useState<any>([])
+export function ContactPage() {
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-    useEffect(()=>{
-        axios.get<ContactResponse>(BACKEND_URL+'/user/bulk',{
-        }).then((response) => setAllUsers(response.data.users))
-    },[])
-
-    return <div className="w-screen h-screen px-10 py-5 flex flex-col gap-4">
-        <Logo/>
-        <div className="w-full h-full flex justify-between">
-        <ContactSidebar allUsers={allUsers}/>
-        <ChatBox/>
+  useEffect(() => {
+    axios
+      .get<ContactResponse>(`${BACKEND_URL}/user/bulk`)
+      .then((response) => setAllUsers(response.data.users));
+  }, []);
+  
+  {console.log(selectedUser)}
+  return (
+    <div className="w-screen h-screen px-10 py-5 flex flex-col gap-4">
+      <Logo />
+      <div className="w-full h-full flex justify-between">
+        <div className="w-80 h-full flex flex-col px-5 py-5 rounded-2xl gap-4 bg-gray-50">
+          <span className="text-3xl font-semibold">Contacts</span>
+          <div className="flex flex-col">
+            {allUsers.map((user) => (
+              <Contact key={user.username} selectedUser={selectedUser} setSelectedUser={setSelectedUser} user={user} />
+            ))}
+          </div>
         </div>
+        <ChatBox selectedUser={selectedUser} />
+      </div>
+      
     </div>
+  );
 }

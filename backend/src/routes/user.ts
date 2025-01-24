@@ -3,7 +3,6 @@ import { accountModel, userModel } from "../db";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { userMiddleware } from "../middlewares/userMiddleware";
-import cors from "cors"
 require('dotenv').config()
 const userRouter = express.Router();
 userRouter.use(express.json())

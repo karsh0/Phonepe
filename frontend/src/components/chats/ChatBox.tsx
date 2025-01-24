@@ -1,12 +1,27 @@
 import { useRef } from "react";
 import { Button } from "../Button";
+import { UserIcon } from "../ui/UserIcon";
+import { User } from "../../pages/contacts/ContactsPage";
 
-export function ChatBox(){
+export function ChatBox({selectedUser}:{selectedUser: User | null}){
     const messageRef = useRef<HTMLInputElement | null>(null)
+    if (!selectedUser) {
+        return (
+          <div className="w-full h-full flex justify-center items-center">
+            <span className="text-lg font-semibold text-gray-500">
+              Select a user to start chatting
+            </span>
+          </div>
+        );
+      }
     return <div className="w-full h-full flex flex-col justify-between p-5">
-        <p className="h-full flex justify-center items-center text-2xl font-medium text-gray-500 mt-10">
-                Start your conversation now.
-            </p>
+       <div className="flex gap-5 items-center px-3 cursor-pointer rounded-xl"           >
+             <div className="w-10 h-10 rounded-full bg-gray-200 flex justify-center items-center">
+               <UserIcon />
+             </div>
+             <span className="text-xl font-semibold">{selectedUser.username}</span>
+           </div>
+        
         <div className="w-full flex gap-2 items-end ">
             <input type="text" placeholder="Start your chat here" className="w-2/3 px-3 py-3 border-black border-[1px] rounded-md" ref={messageRef} />
             <Button text="Send"/>

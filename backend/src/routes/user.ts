@@ -59,7 +59,7 @@ userRouter.get('/bulk',async(req,res)=>{
     const users = await userModel.find();
     res.json({
         users: users.map(user =>({
-            username:user.username
+            user
         }))
     })
         

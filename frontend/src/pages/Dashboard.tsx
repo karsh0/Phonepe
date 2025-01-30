@@ -38,7 +38,6 @@ export default function Dashboard() {
           }
         );
         setUser(response.data.user);
-        console.log(user);
       } catch (error) {
         console.error("Error fetching user data:", error);
       }

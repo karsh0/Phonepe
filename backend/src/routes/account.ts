@@ -11,7 +11,6 @@ router.post('/create', userMiddleware, async (req, res) => {
     const { accountName, accountType, password } = req.body;
     try {
         const user = await userModel.findOne({ _id: req.userId });
-        console.log(user)
         if (!user) {
             res.status(404).json({ message: "User not found" });
         }
@@ -54,41 +53,38 @@ router.get('/accounts', userMiddleware, async (req,res)=>{
     })
 })
 
-router.post('/transfer', userMiddleware, async(req,res)=>{
+router.post('/transfer', userMiddleware, async (req, res) => {
     const session = await mongoose.startSession();
-    session.startTransaction()
-    const {amount, to} = req.body;
+    session.startTransaction();
 
-    const account = await accountModel.findOne({userId: req.userId}).session(session);
+    try {
+        const { amount, to } = req.body;
+        const account = await accountModel.findOne({ userId: req.userId }).session(session);
 
-    if(!account || (account.balance ?? 0) < amount){
+        if (!account || (account.balance ?? 0) < amount) {
+            await session.abortTransaction();
+            res.status(400).json({ message: "Insufficient balance" });
+        }
+
+        const toAccount = await accountModel.findOne({ userId: to }).session(session);
+        if (!toAccount) {
+            await session.abortTransaction();
+            res.status(400).json({ message: "Invalid account" });
+        }
+
+        // Perform the transfer
+        await accountModel.updateOne({ userId: req.userId }, { $inc: { balance: -amount } }).session(session);
+        await accountModel.updateOne({ userId: to }, { $inc: { balance: amount } }).session(session);
+
+        await session.commitTransaction();
+        res.json({ message: "Transaction successful" });
+    } catch (error) {
         await session.abortTransaction();
-        res.json({
-            message: 'Insufficient balance'
-        })
-        return;
+        console.error("Transaction failed:", error);
+        res.status(500).json({ message: "Transaction failed" });
+        session.endSession(); // Ensure session is always ended
     }
-
-    const toAccount = await accountModel.findOne({userId: to}).session(session);
-
-    if(!toAccount){
-        await session.abortTransaction();
-        res.json({
-            message:"Invalid account"
-        })
-        return;
-    }
-    // Perform the transfer
-    await accountModel.updateOne({ userId: req.userId }, { $inc: {balance: -amount}}).session(session);
-    await accountModel.updateOne({ userId: to }, { $inc: { balance: amount } }).session(session);
-    
-    // Commit the transaction
-    await session.commitTransaction();
-
-    res.json({
-        message: "transaction success"
-    })
-})
+});
 
 
 

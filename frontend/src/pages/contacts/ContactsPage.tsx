@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { ContactSidebar } from "../../components/contacts/ContactSidebar";
 import { Logo } from "../../components/Logo";
 import axios from "axios";
 import { BACKEND_URL } from "../../config";
@@ -8,6 +7,7 @@ import { Contact } from "../../components/contacts/Contact";
 
 export interface User {
   username: string;
+  userId: string;
 }
 
 interface ContactResponse {
@@ -15,16 +15,23 @@ interface ContactResponse {
 }
 
 export function ContactPage() {
+  const [user, setUser] = useState<User | null>(null);
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
 
   useEffect(() => {
     axios
       .get<ContactResponse>(`${BACKEND_URL}/user/bulk`)
-      .then((response) => setAllUsers(response.data.users));
+      .then((response) => setAllUsers(response.data.users))
+      .catch((error) => console.error("Error fetching users:", error));
+
+    axios
+      .get<User>(`${BACKEND_URL}/user/dashboard`)
+      .then((response) => setUser(response.data))
+      .catch((error) => console.error("Error fetching current user:", error));
   }, []);
-  
-  {console.log(selectedUser)}
+
   return (
     <div className="w-screen h-screen px-10 py-5 flex flex-col gap-4">
       <Logo />
@@ -32,14 +39,18 @@ export function ContactPage() {
         <div className="w-80 h-full flex flex-col px-5 py-5 rounded-2xl gap-4 bg-gray-50">
           <span className="text-3xl font-semibold">Contacts</span>
           <div className="flex flex-col">
-            {allUsers.map((user) => (
-              <Contact key={user.username} selectedUser={selectedUser} setSelectedUser={setSelectedUser} user={user} />
+            {allUsers.map((user, index) => (
+              <Contact
+                key={user.userId || index}
+                selectedUser={selectedUser}
+                setSelectedUser={setSelectedUser}
+                data={user}
+              />
             ))}
           </div>
         </div>
         <ChatBox selectedUser={selectedUser} />
       </div>
-      
     </div>
   );
 }

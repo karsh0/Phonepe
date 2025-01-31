@@ -7,8 +7,8 @@ interface User {
 
 interface Room {
     roomId: string;
-    senderId: string,
-    receiverId: string,
+    senderId: string;
+    receiverId: string;
     users: User[];
 }
 
@@ -23,13 +23,19 @@ export class UserManager {
 
     createRoom(senderId: string, receiverId: string) {
         const roomId = (globalRoomId++).toString();
-        this.rooms.set(roomId, {
+        this.rooms.set(senderId, {
             roomId,
             senderId,
             receiverId,
             users: []  
         });
+        this.broadcast(roomId, 'This is roomId')
         return roomId;
+    }
+
+    getRoom(senderId: string, receiverId: string){
+        const roomId = this.rooms.get(senderId)?.roomId;
+        return roomId
     }
 
     joinRoom(ws: WebSocket, userId: string, roomId: string) {
@@ -46,10 +52,8 @@ export class UserManager {
         }
 
         room.users.push({ userId, ws });
-
         console.log(`User ${userId} joined room ${roomId}`);
         
-        // Notify other user in the room
         if (room.users.length === 2) {
             this.broadcast(roomId, `User ${userId} joined the chat.`);
         }
@@ -60,12 +64,7 @@ export class UserManager {
         if (!room) return;
 
         room.users.forEach(({ ws }) => {
-                ws.send(JSON.stringify({ message }));
+            ws.send(JSON.stringify({ message }));
         });
-    }
-
-    getRoom(senderId: string, receiverId: string, roomId: string){
-        const room = this.rooms.get(roomId)
-        return room
     }
 }

@@ -3,7 +3,8 @@ import z from 'zod';
 
 export enum SupportedMessages {
     createRoom = "CREATE_ROOM",
-    joinRoom = "JOIN_ROOM"
+    joinRoom = "JOIN_ROOM",
+    sendMessage = "SEND_MESSAGE"
 }
 
 export const InitMessage = z.object({
@@ -26,4 +27,9 @@ export type IncomingMessageType = {
 } | {
     type: SupportedMessages.joinRoom,
     payload: JoinMessageType
+} | {
+    type: SupportedMessages.sendMessage,
+    payload: {
+        message: string
+    }
 }

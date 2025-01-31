@@ -24,7 +24,7 @@ router.post('/create', userMiddleware, async (req, res) => {
                 accountName,
                 accountType,
                 accountNumber: number,
-                balance: 10000
+                balance: 10000,
             });
              res.json({ message: "Account created successfully" });
         } else {
@@ -58,7 +58,7 @@ router.post('/transfer', userMiddleware, async (req, res) => {
     session.startTransaction();
 
     try {
-        const { amount, to } = req.body;
+        const { amount, to } = req.body; ///MAJOR ISSUE: Transaction should happen based on accountId
         const account = await accountModel.findOne({ userId: req.userId }).session(session);
 
         if (!account || (account.balance ?? 0) < amount) {
@@ -66,7 +66,7 @@ router.post('/transfer', userMiddleware, async (req, res) => {
             res.status(400).json({ message: "Insufficient balance" });
         }
 
-        const toAccount = await accountModel.findOne({ userId: to }).session(session);
+        const toAccount = await accountModel.findOne({ _id: to }).session(session);
         if (!toAccount) {
             await session.abortTransaction();
             res.status(400).json({ message: "Invalid account" });
@@ -74,7 +74,7 @@ router.post('/transfer', userMiddleware, async (req, res) => {
 
         // Perform the transfer
         await accountModel.updateOne({ userId: req.userId }, { $inc: { balance: -amount } }).session(session);
-        await accountModel.updateOne({ userId: to }, { $inc: { balance: amount } }).session(session);
+        await accountModel.updateOne({ _id: to }, { $inc: { balance: amount } }).session(session);
 
         await session.commitTransaction();
         res.json({ message: "Transaction successful" });

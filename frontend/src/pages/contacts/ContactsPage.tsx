@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Logo } from "../../components/Logo";
-import axios from "axios";
+import axios, { all } from "axios";
 import { BACKEND_URL } from "../../config";
 import { ChatBox } from "../../components/chats/ChatBox";
 import { Contact } from "../../components/contacts/Contact";
@@ -8,6 +8,7 @@ import { Contact } from "../../components/contacts/Contact";
 export interface User {
   username: string;
   userId: string;
+  accountId: string
 }
 
 interface ContactResponse {
@@ -22,7 +23,7 @@ export function ContactPage() {
 
   useEffect(() => {
     axios
-      .get<ContactResponse>(`${BACKEND_URL}/user/bulk`)
+      .get<any>(`${BACKEND_URL}/user/bulk`)
       .then((response) => setAllUsers(response.data.users))
       .catch((error) => console.error("Error fetching users:", error));
 
@@ -31,7 +32,7 @@ export function ContactPage() {
       .then((response) => setUser(response.data))
       .catch((error) => console.error("Error fetching current user:", error));
   }, []);
-
+  
   return (
     <div className="w-screen h-screen px-10 py-5 flex flex-col gap-4">
       <Logo />

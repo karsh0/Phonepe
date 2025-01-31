@@ -22,7 +22,7 @@ export function SendMoneyModal({ onClose, selectedUser }: {onClose: ()=> void, s
             const response = await axios.post(
                 `${BACKEND_URL}/account/transfer`,
                 {
-                    to: selectedUser.userId,
+                    to: selectedUser.accountId,
                     amount: amount
                 },
                 {
@@ -31,12 +31,7 @@ export function SendMoneyModal({ onClose, selectedUser }: {onClose: ()=> void, s
                     },
                 }
             );
-    
-            // Log and alert success
-            console.log("Transaction Successful:", response.data);
-            alert("Payment successful");
-    
-            // Close the modal after successful transaction
+            alert(response.data.message);
             onClose();
         } catch (error) {
             console.log(error)

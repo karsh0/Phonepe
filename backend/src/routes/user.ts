@@ -56,7 +56,7 @@ userRouter.get('/dashboard', userMiddleware,async (req, res)=>{
 })
 
 userRouter.get('/bulk',async(req,res)=>{
-    const users = await userModel.find();
+    const users = await accountModel.find().populate('userId');
     res.json({
         users: users.map(user =>({
             user

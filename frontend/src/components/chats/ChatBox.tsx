@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import { Button } from "../Button";
 import { UserIcon } from "../ui/UserIcon";
 import { User } from "../../pages/contacts/ContactsPage";
-// import { useSocket } from "../../hooks/socket";
 import { SendMoneyModal } from "../../pages/SendMoneyModal";
 
 export function ChatBox({selectedUser}:{selectedUser: User | null}){
@@ -16,32 +15,9 @@ export function ChatBox({selectedUser}:{selectedUser: User | null}){
         );
       }
       
-      // const socket = useSocket()
       const messageRef = useRef<HTMLInputElement | null>(null)
-      const roomRef = useRef<HTMLInputElement | null>(null)
       const [moneyModal, setMoneyModal] = useState(false)
       
-      
-      // function sendMessage(ev:React.FormEvent){
-        //     ev.preventDefault()
-        //     const message = messageRef.current?.value;
-        //     const roomId = roomRef.current?.value;
-        //     if(!socket){
-          //       console.log('socket failed');
-          //       return;
-          //     }
-          
-          //     socket.send(
-            //       JSON.stringify({
-    //         type:"join",
-    //         payload:{
-    //           message,
-    //           roomId
-    //         }
-    //       })
-    //     )
-    // }
-
     return <div className="w-full h-full flex flex-col justify-between p-5">
        <div className="flex gap-5 items-center px-3 cursor-pointer rounded-xl"           >
              <div className="w-10 h-10 rounded-full bg-gray-200 flex justify-center items-center">

@@ -55,6 +55,7 @@ export function ContactPage() {
                 selectedUser={selectedUser}
                 setSelectedUser={setSelectedUser}
                 data={contact}
+                ws={ws}
               />
             ))}
           </div>

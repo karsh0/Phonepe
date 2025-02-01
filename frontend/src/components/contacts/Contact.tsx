@@ -6,11 +6,19 @@ export function Contact({
   data,
   selectedUser,
   setSelectedUser,
+  ws
 }: {
   data: any;
   selectedUser: any; 
   setSelectedUser: any;
+  ws: WebSocket | null
 }) {
+
+
+  interface RoomResponse{
+    message: string,
+    roomId: string
+  }
 
   async function createRoom() {
     const newSelectedUser = {
@@ -22,11 +30,23 @@ export function Contact({
     setSelectedUser(newSelectedUser);
   
     try {
-      alert('creating room')
-      const response = await axios.post(`${BACKEND_URL}/user/room`, {
+      const response = await axios.post<RoomResponse>(`${BACKEND_URL}/user/room`, {
         receiverId: newSelectedUser.userId, 
+      },{
+        headers:{
+          Authorization: localStorage.getItem("token")
+        }
       });
-      console.log(response.data)
+
+      ws?.send(JSON.stringify({
+        type: "CREATE_ROOM",
+        payload: {
+          senderId: data.user.userId._id,
+          receiverId: newSelectedUser.userId,
+          roomId: response.data.roomId
+        }
+      }))
+
       alert(response.data.message);
     } catch (error) {
       console.error("Error creating room:", error);
@@ -40,7 +60,7 @@ export function Contact({
       className={`flex gap-5 items-center px-3 py-3 cursor-pointer hover:bg-green-300 rounded-xl ${
         selectedUser?.username === data.user.userId.username ? "bg-green-300" : ""
       }`}
-      onClick={()=> createRoom()}
+      onClick={createRoom}
     >
       <div className="w-10 h-10 rounded-full bg-gray-200 flex justify-center items-center">
         <UserIcon />

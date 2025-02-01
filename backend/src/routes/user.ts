@@ -47,7 +47,13 @@ userRouter.post('/signin', async(req,res)=>{
     }
 })
 
-
+userRouter.get('/dashboard', userMiddleware,async (req, res)=>{
+    const user = await accountModel.find({userId: req.userId}).populate('userId')
+    res.json({
+        message:"dashboard",
+        user
+    })
+})
 
 userRouter.get('/bulk',async(req,res)=>{
     const users = await accountModel.find().populate('userId');
@@ -60,22 +66,24 @@ userRouter.get('/bulk',async(req,res)=>{
 
 //chat function
 
-userRouter.get('/dashboard', userMiddleware,async (req, res)=>{
-    const user = await accountModel.find({userId: req.userId}).populate('userId')
-    res.json({
-        message:"dashboard",
-        user
-    })
-})
 
 userRouter.post('/room', userMiddleware, async(req,res)=>{
     const {receiverId} = req.body;
     const senderId = req.userId;
     try{
-        const response = await roomModel.create({
+        const room = await roomModel.findOne({senderId})
+        if(room){
+            res.json({
+                message: "room exists",
+                roomId: room.roomId
+            })
+            return;
+        }
+        const roomId = `${senderId}-${receiverId}`
+        await roomModel.create({
             senderId,
             receiverId,
-            roomId: senderId
+            roomId
         })
         res.json({
             message: "room created success",

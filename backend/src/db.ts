@@ -21,7 +21,7 @@ const accountSchema = new Schema({
 
 const roomSchema = new Schema({
     senderId: String,
-    reveiverId: String,
+    receiverId: String,
     roomId: String
 })
 

@@ -6,7 +6,7 @@ const wss = new WebSocketServer({ port: 8080 });
 const userManager = new UserManager();
 
 wss.on("connection", (ws: WebSocket) => {
-    let roomId: string =  '';
+    let roomId: string =  '1';
 
     ws.on("message", (data: string) => {
         try {
@@ -22,14 +22,18 @@ wss.on("connection", (ws: WebSocket) => {
                 roomId = userManager.createRoom(payload.senderId, payload.receiverId);
                 ws.send(JSON.stringify({ type: "ROOM_CREATED", roomId }));
 
+
             } else if (type === SupportedMessages.joinRoom && roomId) {
                 userManager.joinRoom(ws, payload.userId, roomId);
                 ws.send(JSON.stringify({ type: "ROOM_JOINED", roomId }));
 
+
             } else if (type === SupportedMessages.sendMessage && roomId) {
                 userManager.broadcast(roomId, payload.message);
+
+
             } else {
-                ws.send(JSON.stringify({ error: "Invalid message or roomId" }));
+                ws.send(JSON.stringify({ error: "Invalid message or roomId" , roomId}));
             }
 
         } catch (error) {

@@ -12,7 +12,7 @@ interface Room {
     users: User[];
 }
 
-let globalRoomId = 1;
+// let globalRoomId = 1;
 
 export class UserManager {
     private rooms: Map<string, Room>;
@@ -22,7 +22,7 @@ export class UserManager {
     }
 
     createRoom(senderId: string, receiverId: string) {
-        const roomId = (globalRoomId++).toString();
+        const roomId = '1';
         this.rooms.set(senderId, {
             roomId,
             senderId,

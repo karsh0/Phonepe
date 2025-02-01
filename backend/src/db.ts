@@ -1,4 +1,5 @@
 import mongoose, { model, Schema } from "mongoose"
+import { ScriptElementKindModifier } from "typescript"
 require('dotenv').config()
 
 mongoose.connect(process.env.MONGO_URI || "")
@@ -16,7 +17,16 @@ const accountSchema = new Schema({
     balance: Number,
 })
 
+// rooms from websocket 
+
+const roomSchema = new Schema({
+    senderId: String,
+    reveiverId: String,
+    roomId: String
+})
+
 const userModel = model('User', userSchema)
 const accountModel = model('Account', accountSchema)
+const roomModel = model('Room', roomSchema)
 
-export { userModel, accountModel }
+export { userModel, accountModel, roomModel}

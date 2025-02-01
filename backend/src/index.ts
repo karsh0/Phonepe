@@ -11,7 +11,6 @@ app.use(cors({
 app.use(express.json())
 app.use('/user', userRouter);
 app.use('/account', router);
- 
 
 
 app.listen(3000, ()=>{

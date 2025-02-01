@@ -4,7 +4,7 @@ import { UserIcon } from "../ui/UserIcon";
 import { User } from "../../pages/contacts/ContactsPage";
 import { SendMoneyModal } from "../../pages/SendMoneyModal";
 
-export function ChatBox({selectedUser}:{selectedUser: User | null}){
+export function ChatBox({selectedUser, ws}:{selectedUser: User | null, ws:WebSocket | null}){
     if (!selectedUser) {
         return (
             <div className="w-full h-full flex justify-center items-center">

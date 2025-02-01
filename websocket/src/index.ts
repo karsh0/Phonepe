@@ -18,8 +18,11 @@ wss.on("connection", (ws: WebSocket) => {
                     ws.send(JSON.stringify({ error: "Missing senderId or receiverId" }));
                     return;
                 }
-
-                roomId = userManager.createRoom(payload.senderId, payload.receiverId);
+                const room = userManager.getRoom(payload.senderId, payload.receiverId)
+                if(room){
+                    return;
+                }
+                userManager.createRoom(payload.senderId, payload.receiverId);
                 ws.send(JSON.stringify({ type: "ROOM_CREATED", roomId }));
 
 

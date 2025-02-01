@@ -23,7 +23,7 @@ export class UserManager {
 
     createRoom(senderId: string, receiverId: string) {
         const roomId = '1';
-        this.rooms.set(senderId, {
+        this.rooms.set(roomId, {
             roomId,
             senderId,
             receiverId,
@@ -33,10 +33,25 @@ export class UserManager {
         return roomId;
     }
 
-    getRoom(senderId: string, receiverId: string){
-        const roomId = this.rooms.get(senderId)?.roomId;
-        return roomId
+    getRoom(senderId: string, receiverId: string) {
+        const user1Room = this.rooms.get(senderId);
+        const user2Room = this.rooms.get(receiverId);
+    
+        if (user1Room && user1Room === user2Room) {
+            return user1Room;
+        }
+        
+        if (user1Room) {
+            return user1Room;
+        }
+        
+        if (user2Room) {
+            return user2Room;
+        }
+    
+        return null;
     }
+    
 
     joinRoom(ws: WebSocket, userId: string, roomId: string) {
         let room = this.rooms.get(roomId);

@@ -1,4 +1,5 @@
 import WebSocket from "ws";
+import axios from "axios";
 
 interface User {
     userId: string;
@@ -7,12 +8,9 @@ interface User {
 
 interface Room {
     roomId: string;
-    senderId: string;
-    receiverId: string;
     users: User[];
 }
 
-// let globalRoomId = 1;
 
 export class UserManager {
     private rooms: Map<string, Room>;
@@ -21,37 +19,32 @@ export class UserManager {
         this.rooms = new Map<string, Room>();
     }
 
-    createRoom(senderId: string, receiverId: string) {
-        const roomId = '1';
-        this.rooms.set(roomId, {
-            roomId,
-            senderId,
-            receiverId,
-            users: []  
-        });
-        this.broadcast(roomId, 'This is roomId')
-        return roomId;
-    }
+     createRoom() {
+        try {
+            // Fetch roomId from the database
+            // const response = await axios.get(`http://localhost:3000/user/room`, {
+            //     params: { receiverId }, // Pass receiverId as query parameter
+            // });
+            
 
-    getRoom(senderId: string, receiverId: string) {
-        const user1Room = this.rooms.get(senderId);
-        const user2Room = this.rooms.get(receiverId);
-    
-        if (user1Room && user1Room === user2Room) {
-            return user1Room;
+            const roomId = '1';
+
+            if (!roomId) {
+                console.error("Failed to retrieve roomId from DB");
+                return null;
+            }
+
+            this.rooms.set(roomId, {
+                roomId,
+                users: []
+            });
+            this.broadcast(roomId, "Room created")
+            console.log(`Room ${roomId} created.`);
+        } catch (error) {
+            console.error("Error fetching roomId from DB:", error);
+            return null;
         }
-        
-        if (user1Room) {
-            return user1Room;
-        }
-        
-        if (user2Room) {
-            return user2Room;
-        }
-    
-        return null;
     }
-    
 
     joinRoom(ws: WebSocket, userId: string, roomId: string) {
         let room = this.rooms.get(roomId);
@@ -68,18 +61,45 @@ export class UserManager {
 
         room.users.push({ userId, ws });
         console.log(`User ${userId} joined room ${roomId}`);
-        
+        this.broadcast(roomId, `User ${userId} joined the chat.`);
+
+
         if (room.users.length === 2) {
             this.broadcast(roomId, `User ${userId} joined the chat.`);
         }
     }
 
-    broadcast(roomId: string, message: string) {
-        const room = this.rooms.get(roomId);
-        if (!room) return;
+    // getRoom(senderId: string, receiverId: string) {
+    //     const roomId1 = `${senderId}-${receiverId}`;
+    //     const roomId2 = `${receiverId}-${senderId}`;
+    
+    //     const room1 = this.rooms.get(roomId1);
+    //     const room2 = this.rooms.get(roomId2);
+    
+    //     if (room1) return room1;
+    //     if (room2) return room2;
+    
+    //     return null;
+    // }
+    
 
-        room.users.forEach(({ ws }) => {
-            ws.send(JSON.stringify({ message }));
+    broadcast(roomId: string, message: string) {
+
+        const room = this.rooms.get(roomId);
+        if (!room) {
+            console.log(`Broadcast failed: Room ${roomId} not found.`);
+            return;
+        }
+    
+        console.log(`Broadcasting to room ${roomId}: ${message}`);
+        room.users.forEach(({ ws, userId }) => {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ message }));
+                console.log(`Message sent to ${userId}`);
+            } else {
+                console.log(`Skipping ${userId}, WebSocket not open.`);
+            }
         });
     }
+    
 }

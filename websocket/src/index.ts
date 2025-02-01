@@ -6,7 +6,10 @@ const wss = new WebSocketServer({ port: 8080 });
 const userManager = new UserManager();
 
 wss.on("connection", (ws: WebSocket) => {
-    let roomId: string =  '1';
+    let roomId: string | null = '1';
+    if(!roomId){
+        return;
+    }
 
     ws.on("message", (data: string) => {
         try {
@@ -14,15 +17,8 @@ wss.on("connection", (ws: WebSocket) => {
             const { type, payload } = message;
 
             if (type === SupportedMessages.createRoom) {
-                if (!payload.senderId || !payload.receiverId) {
-                    ws.send(JSON.stringify({ error: "Missing senderId or receiverId" }));
-                    return;
-                }
-                const room = userManager.getRoom(payload.senderId, payload.receiverId)
-                if(room){
-                    return;
-                }
-                userManager.createRoom(payload.senderId, payload.receiverId);
+              
+                userManager.createRoom();
                 ws.send(JSON.stringify({ type: "ROOM_CREATED", roomId }));
 
 
@@ -33,6 +29,7 @@ wss.on("connection", (ws: WebSocket) => {
 
             } else if (type === SupportedMessages.sendMessage && roomId) {
                 userManager.broadcast(roomId, payload.message);
+                ws.send(JSON.stringify({ type: "MESSAGE SENT", message: payload.message }));
 
 
             } else {

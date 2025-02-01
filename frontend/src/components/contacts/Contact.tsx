@@ -14,10 +14,9 @@ export function Contact({
   ws: WebSocket | null
 }) {
 
-
-  interface RoomResponse{
-    message: string,
-    roomId: string
+  interface RoomResponse {
+    message: string;
+    roomId: string;
   }
 
   async function createRoom() {
@@ -26,34 +25,59 @@ export function Contact({
       username: data.user.userId.username,
       accountId: data.user._id,
     };
-  
+
     setSelectedUser(newSelectedUser);
-  
+
     try {
-      const response = await axios.post<RoomResponse>(`${BACKEND_URL}/user/room`, {
-        receiverId: newSelectedUser.userId, 
-      },{
-        headers:{
+      // First, check if the room already exists
+      const response = await axios.get<RoomResponse>(`${BACKEND_URL}/user/room`, {
+        params: { receiverId: newSelectedUser.userId },
+        headers: {
           Authorization: localStorage.getItem("token")
         }
       });
 
-      ws?.send(JSON.stringify({
-        type: "CREATE_ROOM",
-        payload: {
-          senderId: data.user.userId._id,
+      if (response.data.roomId) {
+        // Room exists, join the room
+        ws?.send(JSON.stringify({
+          type: "JOIN_ROOM",
+          payload: {
+            userId: data.user.userId._id,
+            roomId: response.data.roomId
+          }
+        }));
+        alert("Joined existing room.");
+      } else {
+        // Room does not exist, create the room
+        const createResponse = await axios.post<RoomResponse>(`${BACKEND_URL}/user/room`, {
           receiverId: newSelectedUser.userId,
-          roomId: response.data.roomId
-        }
-      }))
+        }, {
+          headers: {
+            Authorization: localStorage.getItem("token")
+          }
+        });
 
-      alert(response.data.message);
+        // Notify WebSocket to create and join the room
+        const roomId = createResponse.data.roomId;
+        ws?.send(JSON.stringify({
+          type: "CREATE_ROOM",
+          payload: { roomId }
+        }));
+        ws?.send(JSON.stringify({
+          type: "JOIN_ROOM",
+          payload: {
+            userId: data.user.userId._id,
+            roomId
+          }
+        }));
+
+        alert(createResponse.data.message);
+      }
     } catch (error) {
-      console.error("Error creating room:", error);
-      alert("Failed to create room");
+      console.error("Error creating or joining room:", error);
+      alert("Failed to create or join room");
     }
   }
-  
 
   return (
     <div

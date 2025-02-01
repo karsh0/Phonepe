@@ -48,10 +48,9 @@ userRouter.post('/signin', async(req,res)=>{
 })
 
 userRouter.get('/dashboard', userMiddleware,async (req, res)=>{
-    const user = await accountModel.find({userId: req.userId}).populate('userId')
+    const foundUser = await accountModel.findOne({userId: req.userId}).populate('userId')
     res.json({
-        message:"dashboard",
-        user
+        user: foundUser
     })
 })
 
@@ -87,7 +86,7 @@ userRouter.post('/room', userMiddleware, async(req,res)=>{
         })
         res.json({
             message: "room created success",
-            roomId: senderId
+            roomId: roomId
         })
     }catch(e){
         console.log(e)
@@ -95,14 +94,21 @@ userRouter.post('/room', userMiddleware, async(req,res)=>{
     }
 })
 
-userRouter.get('/room', async(req,res)=>{
-    const {senderId} = req.body;
-    const room = await roomModel.findOne({
-        roomId: senderId
-    })
-    res.json({
-        message: room
-    })
-})
+userRouter.get('/room', userMiddleware, async (req, res) => {
+    const { receiverId } = req.query;  // Use req.query for GET request
+    const senderId = req.userId;
+    
+    const roomId = `${senderId}-${receiverId}`;
+    const reverseRoomId = `${receiverId}-${senderId}`;
+    
+    // Check the room in the DB
+    const room = await roomModel.findOne({ $or: [{ roomId }, { roomId: reverseRoomId }] });
+    
+    if (room) {
+        res.json({ roomId: room.roomId });
+    } else {
+        res.json({ roomId: null });
+    }
+});
 
 export default userRouter;

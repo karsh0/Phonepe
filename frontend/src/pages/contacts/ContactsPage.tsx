@@ -12,35 +12,47 @@ export interface User {
   accountId: string;
 }
 
-interface ContactResponse {
-  users: User[];
-}
+
 export function ContactPage() {
   const [user, setUser] = useState<User | null>(null);
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [ws, setWs] = useState<WebSocket | null>(null);
 
-  // Fetch users on mount
+  const ws = useSocket();
+
   useEffect(() => {
     axios
-      .get<ContactResponse>(`${BACKEND_URL}/user/bulk`)
-      .then((response) => setAllUsers(response.data.users))
-      .catch((error) => console.error("Error fetching users:", error));
-
-    axios
-      .get<User>(`${BACKEND_URL}/user/dashboard`)
-      .then((response) => setUser(response.data))
+      .get<any>(`${BACKEND_URL}/user/dashboard`, {
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
+      })
+      .then((response) => {
+        setUser({
+          userId: response.data.user.userId._id,
+          username: response.data.user.userId.username,
+          accountId: response.data.user._id, 
+        });
+      })
       .catch((error) => console.error("Error fetching current user:", error));
   }, []);
 
-  // WebSocket Connection (Fixing Infinite Loop)
-  const socket = useSocket();
   useEffect(() => {
-    if (!ws) {
-      setWs(socket);
-    }
-  }, [socket, ws]); // Run only when `socket` or `ws` changes
+    if (!user) return;
+
+    axios
+      .get<any>(`${BACKEND_URL}/user/bulk`)
+      .then((response) => {
+        const filteredUsers = response.data.users.filter(
+          (u: any) => u.user.userId.username !== user.username
+        ).filter((value: any, index: any, self: any) => 
+          index === self.findIndex((t: any) => t.user.userId.username === value.user.userId.username) 
+        );
+        console.log(filteredUsers);
+        setAllUsers(filteredUsers);
+      })
+      .catch((error) => console.error("Error fetching users:", error));
+  }, [user]);
 
   return (
     <div className="w-screen h-screen px-10 py-5 flex flex-col gap-4">
@@ -55,7 +67,7 @@ export function ContactPage() {
                 selectedUser={selectedUser}
                 setSelectedUser={setSelectedUser}
                 data={contact}
-                ws={ws}
+                ws={ws} // WebSocket
               />
             ))}
           </div>

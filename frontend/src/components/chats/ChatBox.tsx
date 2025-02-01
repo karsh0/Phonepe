@@ -16,6 +16,18 @@ export function ChatBox({selectedUser, ws}:{selectedUser: User | null, ws:WebSoc
       }
       
       const messageRef = useRef<HTMLInputElement | null>(null)
+
+      function sendMessage(){
+        ws?.send(JSON.stringify({
+          type: "SEND_MESSAGE",
+          payload:{
+            message: messageRef.current?.value,
+            roomId: '679c9cf008beede68fc66714-679c9d1c08beede68fc66725'
+          }
+        }))
+      }
+
+
       const [moneyModal, setMoneyModal] = useState(false)
       
     return <div className="w-full h-full flex flex-col justify-between p-5">
@@ -28,7 +40,7 @@ export function ChatBox({selectedUser, ws}:{selectedUser: User | null, ws:WebSoc
         
         <div className="w-full flex gap-2 items-end ">
             <input type="text" placeholder="Start your chat here" className="w-2/3 px-3 py-3 border-black border-[1px] rounded-md" ref={messageRef} />
-            <Button text="Send"/>
+            <Button text="Send" onClick={sendMessage}/>
             <Button onClick={()=> setMoneyModal(true)} text="Pay Money" variant="primary"/>
         </div>
 
